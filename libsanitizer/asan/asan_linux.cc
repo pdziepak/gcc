@@ -162,8 +162,18 @@ void ReadContextStack(void *context, uptr *stack, uptr *ssize) {
   *stack = (uptr)ucp->uc_stack.ss_sp;
   *ssize = ucp->uc_stack.ss_size;
 }
+
+void WriteContextStack(void *context, uptr stack, uptr ssize) {
+  ucontext_t *ucp = (ucontext_t*)context;
+  ucp->uc_stack.ss_sp = (void*)stack;
+  ucp->uc_stack.ss_size = ssize;
+}
 #else
 void ReadContextStack(void *context, uptr *stack, uptr *ssize) {
+  UNIMPLEMENTED();
+}
+
+void WriteContextStack(void *context, uptr stack, uptr ssize) {
   UNIMPLEMENTED();
 }
 #endif

@@ -330,12 +330,27 @@ INTERCEPTOR(int, swapcontext, struct ucontext_t *oucp,
   uptr stack, ssize;
   ReadContextStack(ucp, &stack, &ssize);
   ClearShadowMemoryForContextStack(stack, ssize);
+
+  AsanThread *curr_thread = GetCurrentThread();
+  if (curr_thread) {
+    WriteContextStack(oucp, curr_thread->stack_bottom(), curr_thread->stack_size());
+  }
+
   int res = REAL(swapcontext)(oucp, ucp);
   // swapcontext technically does not return, but program may swap context to
   // "oucp" later, that would look as if swapcontext() returned 0.
   // We need to clear shadow for ucp once again, as it may be in arbitrary
   // state.
   ClearShadowMemoryForContextStack(stack, ssize);
+  return res;
+}
+
+INTERCEPTOR(int, getcontext, struct ucontext_t *ucp) {
+  int res = REAL(getcontext)(ucp);
+  AsanThread *curr_thread = GetCurrentThread();
+  if (!res && curr_thread) {
+    WriteContextStack(ucp, curr_thread->stack_bottom(), curr_thread->stack_size());
+  }
   return res;
 }
 #endif  // ASAN_INTERCEPT_SWAPCONTEXT
@@ -780,6 +795,7 @@ void InitializeAsanInterceptors() {
 #endif
 #if ASAN_INTERCEPT_SWAPCONTEXT
   ASAN_INTERCEPT_FUNC(swapcontext);
+  ASAN_INTERCEPT_FUNC(getcontext);
 #endif
 #if ASAN_INTERCEPT__LONGJMP
   ASAN_INTERCEPT_FUNC(_longjmp);

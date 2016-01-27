@@ -245,6 +245,10 @@ void ReadContextStack(void *context, uptr *stack, uptr *ssize) {
   UNIMPLEMENTED();
 }
 
+void WriteContextStack(void *context, uptr stack, uptr ssize) {
+  UNIMPLEMENTED();
+}
+
 // Support for the following functions from libdispatch on Mac OS:
 //   dispatch_async_f()
 //   dispatch_async()
