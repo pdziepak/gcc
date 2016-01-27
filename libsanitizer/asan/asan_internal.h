@@ -79,6 +79,7 @@ void AsanOnSIGSEGV(int, void *siginfo, void *context);
 void MaybeReexec();
 bool AsanInterceptsSignal(int signum);
 void ReadContextStack(void *context, uptr *stack, uptr *ssize);
+void WriteContextStack(void *context, uptr stack, uptr ssize);
 void AsanPlatformThreadInit();
 void StopInitOrderChecking();
 

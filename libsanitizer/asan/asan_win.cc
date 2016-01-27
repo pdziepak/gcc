@@ -81,6 +81,10 @@ void ReadContextStack(void *context, uptr *stack, uptr *ssize) {
   UNIMPLEMENTED();
 }
 
+void WriteContextStack(void *context, uptr stack, uptr ssize) {
+  UNIMPLEMENTED();
+}
+
 void AsanOnSIGSEGV(int, void *siginfo, void *context) {
   UNIMPLEMENTED();
 }
