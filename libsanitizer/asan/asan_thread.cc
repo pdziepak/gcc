@@ -148,6 +148,10 @@ FakeStack *AsanThread::AsyncSignalSafeLazyInitFakeStack() {
 }
 
 void AsanThread::Init() {
+  temp_stack_ = &stacks_[0];
+  next_stack_ = &stacks_[1];
+  previous_stack_ = &stacks_[2];
+
   fake_stack_ = nullptr;  // Will be initialized lazily if needed.
   CHECK_EQ(this->stack_size(), 0U);
   SetThreadStackAndTls();
@@ -193,10 +197,11 @@ thread_return_t AsanThread::ThreadStart(
 
 void AsanThread::SetThreadStackAndTls() {
   uptr tls_size = 0;
-  GetThreadStackAndTls(tid() == 0, &current_stack_.stack_bottom,
-                       &current_stack_.stack_size, &tls_begin_, &tls_size);
-  current_stack_.stack_top = current_stack_.stack_bottom
-                             + current_stack_.stack_size;
+  GetThreadStackAndTls(tid() == 0, &next_stack_->stack_bottom,
+                       &next_stack_->stack_size, &tls_begin_, &tls_size);
+  next_stack_->stack_top = next_stack_->stack_bottom + next_stack_->stack_size;
+  previous_stack_->stack_top = previous_stack_->stack_bottom = 0;
+  previous_stack_->stack_size = 0;
   tls_end_ = tls_begin_ + tls_size;
 
   int local;
