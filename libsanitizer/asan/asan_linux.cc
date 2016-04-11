@@ -105,6 +105,7 @@ static void ReportIncompatibleRT() {
 }
 
 void AsanCheckDynamicRTPrereqs() {
+#if 0
   // Ensure that dynamic RT is the first DSO in the list
   const char *first_dso_name = 0;
   dl_iterate_phdr(FindFirstDSOCallback, &first_dso_name);
@@ -114,6 +115,7 @@ void AsanCheckDynamicRTPrereqs() {
            "manually preload it with LD_PRELOAD.\n");
     Die();
   }
+#endif
 }
 
 void AsanCheckIncompatibleRT() {
